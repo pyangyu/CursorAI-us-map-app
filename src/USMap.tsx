@@ -9,7 +9,7 @@ interface Props {
 const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // 动态设置每个 path 的 fill
+  // 动态设置每个 path 的样式
   useEffect(() => {
     if (!svgRef.current) return;
 
@@ -18,10 +18,19 @@ const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
     paths.forEach((path) => {
       const title = path.querySelector('title');
       const name = title?.textContent;
+      
+      // 设置基础样式
+      path.style.transition = 'all 0.3s ease';
+      path.style.stroke = 'rgba(0, 0, 0, 0.5)';
+      path.style.strokeWidth = '2.5px';
+      path.style.fillOpacity = '0.9';
+      path.style.cursor = 'pointer';
+      
+      // 设置颜色
       if (name && colorMap[name]) {
-        path.setAttribute('fill', colorMap[name]);
+        path.style.fill = colorMap[name];
       } else {
-        path.setAttribute('fill', '#fff'); // reset to white or default
+        path.style.fill = '#ffffff';
       }
     });
   }, [colorMap]);
@@ -37,17 +46,17 @@ const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
   };
 
   return (
-    <div style={{ width: '100%', overflowX: 'auto' }}>
+    <div className="map-wrapper" style={{ width: '100%', overflowX: 'auto' }}>
       <UsaMap
-        ref={svgRef} // 把 SVG 挂上 ref
+        ref={svgRef}
         onClick={handleClick}
         style={{
           width: '100%',
           height: 'auto',
           maxWidth: '1000px',
+          minWidth: '600px',
           display: 'block',
           margin: '0 auto',
-          cursor: 'pointer',
         }}
       />
     </div>
