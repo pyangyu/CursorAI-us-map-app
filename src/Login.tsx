@@ -11,52 +11,52 @@ export default function Login() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 验证用户名和密码是否为空
+    // Validate username and password
     if (!username || !password) {
-      setError('用户名和密码不能为空');
+      setError('Username and password cannot be empty');
       return;
     }
 
-    // 验证用户名和密码
+    // Verify username and password
     if (username === 'admin' && password === 'password') {
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('username', username);
       navigate('/');
     } else {
-      setError('用户名或密码错误，请联系 pyang33@illinois.edu');
+      setError('Invalid username or password. Please contact pyang33@illinois.edu');
     }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.loginBox}>
-        <h2 style={styles.title}>登录</h2>
+        <h2 style={styles.title}>Login</h2>
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label htmlFor="username" style={styles.label}>用户名</label>
+            <label htmlFor="username" style={styles.label}>Username</label>
             <input
               type="text"
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               style={styles.input}
-              placeholder="请输入用户名"
+              placeholder="Enter your username"
             />
           </div>
           <div style={styles.inputGroup}>
-            <label htmlFor="password" style={styles.label}>密码</label>
+            <label htmlFor="password" style={styles.label}>Password</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
-              placeholder="请输入密码"
+              placeholder="Enter your password"
             />
           </div>
           {error && <p style={styles.error}>{error}</p>}
           <button type="submit" style={styles.button}>
-            登录
+            Login
           </button>
         </form>
       </div>
