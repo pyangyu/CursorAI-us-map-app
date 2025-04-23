@@ -4,6 +4,44 @@ import USMap from './USMap';
 import { PlayerScores, ColorMaps, StateCount } from './types';
 import './App.css';
 
+const getDistinctColor = (state: string, currentColors: Record<string, string>) => {
+  // 预定义一组明显不同的颜色
+  const baseColors = [
+    '#FF6B6B', // 鲜红
+    '#4ECDC4', // 青绿
+    '#45B7D1', // 天蓝
+    '#96CEB4', // 薄荷绿
+    '#FFD93D', // 明黄
+    '#FF8B94', // 粉红
+    '#6C5B7B', // 紫色
+    '#C06C84', // 玫瑰红
+    '#2E86AB', // 深蓝
+    '#A8E6CF', // 浅绿
+    '#FFAAA5', // 珊瑚色
+    '#FF9999', // 浅红
+    '#88D8B0', // 翠绿
+    '#FFC75F', // 橙黄
+    '#B5EAD7', // 薄荷奶绿
+  ];
+
+  // 获取已使用的颜色
+  const usedColors = Object.values(currentColors);
+  
+  // 找到一个未使用的颜色
+  const availableColors = baseColors.filter(color => !usedColors.includes(color));
+  
+  // 如果还有未使用的颜色，随机选择一个
+  if (availableColors.length > 0) {
+    return availableColors[Math.floor(Math.random() * availableColors.length)];
+  }
+  
+  // 如果所有颜色都已使用，生成一个随机的明亮颜色
+  const hue = Math.random() * 360; // 随机色相
+  const saturation = 70 + Math.random() * 20; // 70-90% 饱和度
+  const lightness = 45 + Math.random() * 15; // 45-60% 亮度
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+};
+
 export default function App() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string | null>(null);
@@ -43,15 +81,15 @@ export default function App() {
       return;
     }
 
-    // Generate random color
-    const color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
+    // Get distinct color
+    const newColor = getDistinctColor(state, colorMaps[currentPlayer]);
 
     // Update color map for current player
     setColorMaps((prev) => ({
       ...prev,
       [currentPlayer]: {
         ...prev[currentPlayer],
-        [state]: color
+        [state]: newColor
       }
     }));
     

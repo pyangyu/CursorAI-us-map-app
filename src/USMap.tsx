@@ -23,7 +23,7 @@ const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
     });
 
     // 继续动画，直到达到最大值
-    if (scaleRef.current < 1.01) { // 最大放大到 1.01
+    if (scaleRef.current < 1.005) { // 减小最大缩放值
       animationFrameRef.current = requestAnimationFrame(adjustStateSize);
     }
   };
@@ -37,11 +37,11 @@ const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
     // 首先设置所有路径的基础样式
     paths.forEach((path) => {
       path.style.transition = 'all 0.3s ease';
-      path.style.stroke = '#666666'; // 更改为灰色
-      path.style.strokeWidth = '2px'; // 增加边框宽度
+      path.style.stroke = '#666666';
+      path.style.strokeWidth = '2px';
       path.style.cursor = 'pointer';
       path.style.fill = '#ffffff';
-      path.style.transformOrigin = 'center center';
+      path.style.transformOrigin = 'center';
       path.style.transformBox = 'fill-box';
     });
 
@@ -77,20 +77,32 @@ const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
   };
 
   return (
-    <div className="map-wrapper" style={{ width: '100%', overflowX: 'auto' }}>
-      <UsaMap
-        ref={svgRef}
-        onClick={handleClick}
-        style={{
-          width: '100%',
-          height: 'auto',
-          maxWidth: '1000px',
-          minWidth: '600px',
-          display: 'block',
-          margin: '0 auto',
-          shapeRendering: 'crispEdges',
-        }}
-      />
+    <div className="map-wrapper" style={{ 
+      width: '100%', 
+      overflowX: 'auto',
+      padding: '1rem'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '1000px',
+        margin: '0 auto',
+        overflow: 'hidden', // 添加overflow控制
+        position: 'relative' // 确保内容不会溢出
+      }}>
+        <UsaMap
+          ref={svgRef}
+          onClick={handleClick}
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block',
+            margin: '0 auto',
+            transform: 'scale(0.98)', // 整体稍微缩小一点
+            transformOrigin: 'center',
+            shapeRendering: 'crispEdges',
+          }}
+        />
+      </div>
     </div>
   );
 };
