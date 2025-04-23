@@ -1,66 +1,57 @@
-import { FC, MouseEvent } from 'react';
+import { FC, MouseEvent, useEffect, useRef } from 'react';
 import UsaMap from './assets/usa-map.svg?react';
 
-const STATE_NAME: Record<string, string> = {
-  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
-  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
-  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
-  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
-  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
-  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
-  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
-  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
-  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
-  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
-};
-
 interface Props {
-    onStateClick?: (stateName: string) => void;
-    colorMap?: Record<string, string>; // New prop
+  onStateClick?: (stateName: string) => void;
+  colorMap?: Record<string, string>;
 }
 
 const USMap: FC<Props> = ({ onStateClick, colorMap = {} }) => {
-    const handleClick = (e: MouseEvent<SVGElement>) => {
-        const target = e.target as SVGGraphicsElement;
-        const title = target.querySelector('title');
-        const stateName = title?.textContent;
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
-        if (stateName) {
-        onStateClick?.(stateName);
-        }
-    };
+  // 动态设置每个 path 的 fill
+  useEffect(() => {
+    if (!svgRef.current) return;
 
-    return (
-        <div style={{ width: '100%', overflowX: 'auto' }}>
-        <UsaMap
-            onClick={handleClick}
-            style={{
-            width: '100%',
-            height: 'auto',
-            maxWidth: '1000px',
-            display: 'block',
-            margin: '0 auto',
-            cursor: 'pointer',
-            }}
-            // Pass dynamic coloring via CSS override
-        >
-            {/* If svg path doesn't reflect fill via props, we’ll inject CSS next */}
-        </UsaMap>
+    const paths = svgRef.current.querySelectorAll('path');
 
-        {/* Optional: fallback CSS (if fill isn’t reactive) */}
-        <style>
-            {Object.entries(colorMap)
-            .map(
-                ([state, color]) => `
-                svg path title:contains("${state}") {
-                    fill: ${color};
-                }
-                `
-            )
-            .join('\n')}
-        </style>
-        </div>
-    );
+    paths.forEach((path) => {
+      const title = path.querySelector('title');
+      const name = title?.textContent;
+      if (name && colorMap[name]) {
+        path.setAttribute('fill', colorMap[name]);
+      } else {
+        path.setAttribute('fill', '#fff'); // reset to white or default
+      }
+    });
+  }, [colorMap]);
+
+  const handleClick = (e: MouseEvent<SVGElement>) => {
+    const target = e.target as SVGGraphicsElement;
+    const title = target.querySelector('title');
+    const stateName = title?.textContent;
+
+    if (stateName) {
+      onStateClick?.(stateName);
+    }
+  };
+
+  return (
+    <div style={{ width: '100%', overflowX: 'auto' }}>
+      <UsaMap
+        ref={svgRef} // 把 SVG 挂上 ref
+        onClick={handleClick}
+        style={{
+          width: '100%',
+          height: 'auto',
+          maxWidth: '1000px',
+          display: 'block',
+          margin: '0 auto',
+          cursor: 'pointer',
+        }}
+      />
+    </div>
+  );
 };
 
 export default USMap;
