@@ -1,17 +1,20 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import USMap from './USMap';
+import { PlayerScores, ColorMaps, StateCount } from './types';
 import './App.css';
 
 export default function App() {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState<string | null>(null);
-  const [colorMaps, setColorMaps] = useState<Record<string, Record<string, string>>>({
+  const [colorMaps, setColorMaps] = useState<ColorMaps>({
     puyu: {},
     jindian: {},
     zifei: {},
     yuting: {},
     shuyu: {}
   });
-  const [scores, setScores] = useState({
+  const [scores, setScores] = useState<PlayerScores>({
     puyu: 0,
     jindian: 0, 
     zifei: 0,
@@ -19,13 +22,19 @@ export default function App() {
     shuyu: 0
   });
   const [currentPlayer, setCurrentPlayer] = useState('puyu');
-  const [stateCount, setStateCount] = useState<Record<string, Record<string, number>>>({
+  const [stateCount, setStateCount] = useState<StateCount>({
     puyu: {},
     jindian: {},
     zifei: {},
     yuting: {},
     shuyu: {}
   });
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('username');
+    navigate('/login');
+  };
 
   const assignRandomColor = (state: string) => {
     // If already colored by current player, return early
@@ -90,6 +99,13 @@ export default function App() {
 
   return (
     <main style={styles.wrapper}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Travel Ranking US Map (Coloring)</h1>
+        <button onClick={handleLogout} style={styles.logoutButton}>
+          登出
+        </button>
+      </div>
+
       <div style={styles.rankingContainer}>
         {Object.entries(scores).map(([name, score]) => (
           <div key={name} style={styles.rankingItem}>
@@ -108,8 +124,6 @@ export default function App() {
           </div>
         ))}
       </div>
-
-      <h1 style={styles.title}>Travel Ranking US Map (Coloring)</h1>
 
       <USMap
         onStateClick={assignRandomColor}
@@ -146,6 +160,25 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: '1200px',
+    marginBottom: '2rem',
+  },
+  logoutButton: {
+    padding: '0.5rem 1rem',
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
   },
   rankingContainer: {
     position: 'fixed',
