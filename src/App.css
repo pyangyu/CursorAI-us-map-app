@@ -274,21 +274,23 @@
 /* 移除旧的地图样式 */
 .mapContainer {
   width: 100%;
+  max-width: 100%;
   height: calc(100vh - 200px);
   min-height: 300px;
   max-height: 800px;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: visible;
+  overflow: hidden;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #dbdbdb;
   margin: 2rem auto;
-  padding: 2rem;
+  padding: 1rem;
   position: relative;
   z-index: 1;
+  box-sizing: border-box; /* 确保padding不会增加实际宽度 */
 }
 
 .map-wrapper {
@@ -297,6 +299,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 .infoSection {
@@ -412,5 +415,26 @@
   cursor: pointer;
   z-index: 2;
   position: relative;
+}
+
+/* 调整主容器样式 */
+main {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+/* 调整内容容器样式 */
+.content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 1rem;
 }
 
