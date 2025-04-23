@@ -1,8 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import USMap from './USMap';
 import { PlayerScores, ColorMaps, StateCount } from './types';
 import './App.css';
+
+// 从 localStorage 加载数据的函数
+const loadFromLocalStorage = () => {
+  try {
+    const savedColorMaps = localStorage.getItem('colorMaps');
+    const savedScores = localStorage.getItem('scores');
+    const savedStateCount = localStorage.getItem('stateCount');
+    const savedCurrentPlayer = localStorage.getItem('currentPlayer');
+
+    return {
+      colorMaps: savedColorMaps ? JSON.parse(savedColorMaps) : null,
+      scores: savedScores ? JSON.parse(savedScores) : null,
+      stateCount: savedStateCount ? JSON.parse(savedStateCount) : null,
+      currentPlayer: savedCurrentPlayer || 'puyu'
+    };
+  } catch (error) {
+    console.error('Error loading data from localStorage:', error);
+    return null;
+  }
+};
+
+// 保存数据到 localStorage 的函数
+const saveToLocalStorage = (colorMaps: ColorMaps, scores: PlayerScores, stateCount: StateCount, currentPlayer: string) => {
+  try {
+    localStorage.setItem('colorMaps', JSON.stringify(colorMaps));
+    localStorage.setItem('scores', JSON.stringify(scores));
+    localStorage.setItem('stateCount', JSON.stringify(stateCount));
+    localStorage.setItem('currentPlayer', currentPlayer);
+  } catch (error) {
+    console.error('Error saving data to localStorage:', error);
+  }
+};
 
 const getDistinctColor = (state: string, currentColors: Record<string, string>) => {
   // 预定义一组明显不同的颜色
@@ -45,32 +77,55 @@ const getDistinctColor = (state: string, currentColors: Record<string, string>) 
 export default function App() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string | null>(null);
-  const [colorMaps, setColorMaps] = useState<ColorMaps>({
-    puyu: {},
-    jindian: {},
-    zifei: {},
-    yuting: {},
-    shuyu: {}
+  
+  // 初始化状态时尝试从 localStorage 加载数据
+  const [colorMaps, setColorMaps] = useState<ColorMaps>(() => {
+    const saved = loadFromLocalStorage();
+    return saved?.colorMaps || {
+      puyu: {},
+      jindian: {},
+      zifei: {},
+      yuting: {},
+      shuyu: {}
+    };
   });
-  const [scores, setScores] = useState<PlayerScores>({
-    puyu: 0,
-    jindian: 0, 
-    zifei: 0,
-    yuting: 0,
-    shuyu: 0
+
+  const [scores, setScores] = useState<PlayerScores>(() => {
+    const saved = loadFromLocalStorage();
+    return saved?.scores || {
+      puyu: 0,
+      jindian: 0,
+      zifei: 0,
+      yuting: 0,
+      shuyu: 0
+    };
   });
-  const [currentPlayer, setCurrentPlayer] = useState('puyu');
-  const [stateCount, setStateCount] = useState<StateCount>({
-    puyu: {},
-    jindian: {},
-    zifei: {},
-    yuting: {},
-    shuyu: {}
+
+  const [currentPlayer, setCurrentPlayer] = useState(() => {
+    const saved = loadFromLocalStorage();
+    return saved?.currentPlayer || 'puyu';
   });
+
+  const [stateCount, setStateCount] = useState<StateCount>(() => {
+    const saved = loadFromLocalStorage();
+    return saved?.stateCount || {
+      puyu: {},
+      jindian: {},
+      zifei: {},
+      yuting: {},
+      shuyu: {}
+    };
+  });
+
+  // 当数据变化时保存到 localStorage
+  useEffect(() => {
+    saveToLocalStorage(colorMaps, scores, stateCount, currentPlayer);
+  }, [colorMaps, scores, stateCount, currentPlayer]);
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('username');
+    // 保留游戏数据，不清除
     navigate('/login');
   };
 
@@ -115,24 +170,36 @@ export default function App() {
 
   const clearColors = () => {
     // Clear only the current player's colors
-    setColorMaps((prev) => ({
-      ...prev,
-      [currentPlayer]: {}
-    }));
+    setColorMaps((prev) => {
+      const newColorMaps = {
+        ...prev,
+        [currentPlayer]: {}
+      };
+      saveToLocalStorage(newColorMaps, scores, stateCount, currentPlayer);
+      return newColorMaps;
+    });
     
     setSelected(null);
     
     // Clear only current player's state count
-    setStateCount((prev) => ({
-      ...prev,
-      [currentPlayer]: {}
-    }));
+    setStateCount((prev) => {
+      const newStateCount = {
+        ...prev,
+        [currentPlayer]: {}
+      };
+      saveToLocalStorage(colorMaps, scores, newStateCount, currentPlayer);
+      return newStateCount;
+    });
     
     // Clear only current player's score
-    setScores((prev) => ({
-      ...prev,
-      [currentPlayer]: 0
-    }));
+    setScores((prev) => {
+      const newScores = {
+        ...prev,
+        [currentPlayer]: 0
+      };
+      saveToLocalStorage(colorMaps, newScores, stateCount, currentPlayer);
+      return newScores;
+    });
   };
 
   return (
