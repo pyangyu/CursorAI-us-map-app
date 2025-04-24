@@ -455,3 +455,208 @@ body {
   box-sizing: border-box;
 }
 
+/* Profile Modal Styles */
+.profile-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.profile-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.profile-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #262626;
+}
+
+.profile-title {
+  color: #666;
+  margin: 0.5rem 0;
+  font-size: 16px;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #262626;
+  font-size: 16px;
+}
+
+.stat-label {
+  color: #8e8e8e;
+  font-size: 14px;
+  margin-top: 0.25rem;
+}
+
+.profile-bio {
+  border-top: 1px solid #dbdbdb;
+  padding-top: 1.5rem;
+}
+
+.profile-bio h3 {
+  color: #262626;
+  font-size: 16px;
+  margin: 1.5rem 0 1rem;
+}
+
+.profile-bio h3:first-child {
+  margin-top: 0;
+}
+
+.profile-bio p {
+  color: #262626;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+.experience-item {
+  margin: 1rem 0;
+}
+
+.experience-item h4 {
+  color: #262626;
+  font-size: 14px;
+  margin: 0 0 0.5rem;
+}
+
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.skill-tag {
+  background: #efefef;
+  color: #262626;
+  padding: 0.5rem 1rem;
+  border-radius: 16px;
+  font-size: 14px;
+}
+
+.profile-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.social-link {
+  background: #0095f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.social-link:hover {
+  background: #0081d6;
+}
+
+.author-button {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  text-decoration: underline;
+  margin-left: 0.5rem;
+}
+
+.author-button:hover {
+  color: #0081d6;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-stats {
+    justify-content: center;
+  }
+
+  .profile-links {
+    flex-direction: column;
+  }
+
+  .social-link {
+    text-align: center;
+  }
+}
+

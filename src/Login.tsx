@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-export default function Login() {
+interface LoginProps {
+  onLogin: (username: string) => void;
+}
+
+export default function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,6 +30,7 @@ export default function Login() {
       console.log('Login successful');
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('username', username);
+      onLogin(username); // 调用 onLogin 回调
       navigate('/');
     } else {
       console.log('Login failed:', { username, password });

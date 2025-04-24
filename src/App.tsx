@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import USMap from './USMap';
 import { PlayerScores, ColorMaps, StateCount } from './types';
 import './App.css';
+import Login from './Login';
+import AuthorProfile from './components/AuthorProfile';
 
 // 从 localStorage 加载数据的函数
 const loadFromLocalStorage = () => {
@@ -77,6 +79,13 @@ const getDistinctColor = (state: string, currentColors: Record<string, string>) 
 export default function App() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem('username') || '';
+  });
+  const [showProfile, setShowProfile] = useState(false);
   
   // 初始化状态时尝试从 localStorage 加载数据
   const [colorMaps, setColorMaps] = useState<ColorMaps>(() => {
@@ -123,11 +132,19 @@ export default function App() {
   }, [colorMaps, scores, stateCount, currentPlayer]);
 
   const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUsername('');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('username');
-    // 保留游戏数据，不清除
     navigate('/login');
   };
+
+  // 如果未登录，重定向到登录页面
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
   const assignRandomColor = (state: string) => {
     // If already colored by current player, return early
@@ -202,57 +219,72 @@ export default function App() {
     });
   };
 
+  const handleLogin = (username: string) => {
+    setIsLoggedIn(true);
+    setUsername(username);
+  };
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
   return (
-    <main style={styles.wrapper}>
-      <div className="header">
-        <h1 className="title">Travel Ranking US Map (Coloring)</h1>
-        <button onClick={handleLogout} className="button logoutButton">
-          Logout
-        </button>
-      </div>
+    <div className="App">
+      <div className="container">
+        <div className="header">
+          <h1>US States Game</h1>
+          <div>
+            Welcome, {username}!
+            <button className="author-button" onClick={() => setShowProfile(true)}>
+              author
+            </button>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        </div>
+        
+        <div style={styles.content}>
+          <div className="rankingContainer">
+            {Object.entries(scores).map(([name, score]) => (
+              <div key={name} style={styles.rankingItem}>
+                <select 
+                  className="select"
+                  value={name}
+                  onChange={(e) => name === currentPlayer && setCurrentPlayer(e.target.value)}
+                  onClick={() => setCurrentPlayer(name)}
+                >
+                  <option value={name}>{name}</option>
+                </select>
+                <span className="score" style={{
+                  color: name === currentPlayer ? '#3498db' : '#242424'
+                }}>{score}</span>
+              </div>
+            ))}
+          </div>
 
-      <div style={styles.content}>
-        <div className="rankingContainer">
-          {Object.entries(scores).map(([name, score]) => (
-            <div key={name} style={styles.rankingItem}>
-              <select 
-                className="select"
-                value={name}
-                onChange={(e) => name === currentPlayer && setCurrentPlayer(e.target.value)}
-                onClick={() => setCurrentPlayer(name)}
-              >
-                <option value={name}>{name}</option>
-              </select>
-              <span className="score" style={{
-                color: name === currentPlayer ? '#3498db' : '#242424'
-              }}>{score}</span>
-            </div>
-          ))}
+          <div className="mapContainer">
+            <USMap
+              onStateClick={assignRandomColor}
+              colorMap={colorMaps[currentPlayer]}
+            />
+          </div>
+
+          <section className="info">
+            <p className="text">
+              {selected
+                ? `${currentPlayer} clicked: ${selected} (${stateCount[currentPlayer][selected] || 0} times) and the color is ${colorMaps[currentPlayer][selected]}`
+                : `Current player: ${currentPlayer} - Click any state to score!`}
+            </p>
+            <button className="button" onClick={clearColors}>
+              Clear
+            </button>
+          </section>
         </div>
 
-        <div className="mapContainer">
-          <USMap
-            onStateClick={assignRandomColor}
-            colorMap={colorMaps[currentPlayer]}
-          />
-        </div>
-
-        <section className="info">
-          <p className="text">
-            {selected
-              ? `${currentPlayer} clicked: ${selected} (${stateCount[currentPlayer][selected] || 0} times) and the color is ${colorMaps[currentPlayer][selected]}`
-              : `Current player: ${currentPlayer} - Click any state to score!`}
-          </p>
-          <button className="button" onClick={clearColors}>
-            Clear
-          </button>
-        </section>
+        {showProfile && (
+          <AuthorProfile onClose={() => setShowProfile(false)} />
+        )}
       </div>
-
-      <footer className="footer">
-        <span>Built with React + Vite ⚡</span>
-      </footer>
-    </main>
+    </div>
   );
 }
 
